@@ -20,4 +20,11 @@ public class NamedLeaf<T extends Comparable<T>> extends AbstractNode<T> {
 
     protected String toStringShort() {return String.valueOf(value) + "(" + name + ")";}
 
+    @Override
+    public String toString() {
+        return "NamedLeaf{" +
+                "name='" + name + '\'' +
+                "value='" + value + '\'' +
+                '}';
+    }
 }

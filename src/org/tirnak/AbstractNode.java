@@ -16,8 +16,11 @@ abstract class AbstractNode<T extends Comparable<T>> implements Node<T> {
     }
 
     private static final String
+        //  "├── "
         CURRENT         = "" + (char)0x251C + (char)0x2500 + (char)0x2500 + " ",
+        //  "└── "
         CURRENT_LAST    = "" + (char)0x2514 + (char)0x2500 + (char)0x2500 + " ",
+        //  "│    "
         PREFIX_USUAL    = "" + (char)0x2502 + "    ",
         PREFIX_LAST     = "      ";
 
@@ -37,4 +40,11 @@ abstract class AbstractNode<T extends Comparable<T>> implements Node<T> {
 
     @Override
     public T getValue() { return value; }
+
+    @Override
+    public String toString() {
+        return "AbstractNode{" +
+                "value=" + value +
+                '}';
+    }
 }

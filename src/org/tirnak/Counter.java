@@ -1,7 +1,6 @@
 package org.tirnak;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +20,17 @@ public class Counter {
         if (!Files.exists(pathToWordsFile)) {
             throw new RuntimeException("Path to file is incorrect." + getUsageDescription());
         }
+
+        Map<String, Integer> wordsMap = extractWordsOccurences(pathToWordsFile);
+        LinkedList<Node<Integer>> nodes = convertWordsOccurencesToLeafNodes(wordsMap);
+        Collections.sort(nodes, (node1, node2) -> node1.getValue().compareTo(node2.getValue()));
+        convertNodeListToTree(nodes);
+        Node<Integer> root = nodes.get(0);
+
+        root.print(System.out);
+    }
+
+    private static Map<String, Integer> extractWordsOccurences(Path pathToWordsFile) throws IOException {
         List<String> fileContent = Files.readAllLines(pathToWordsFile);
         Map<String, Integer> wordsMap = new HashMap<>();
         for (String line : fileContent) {
@@ -34,13 +44,18 @@ public class Counter {
                 }
             }
         }
+        return wordsMap;
+    }
+
+    private static LinkedList<Node<Integer>> convertWordsOccurencesToLeafNodes(Map<String, Integer> wordsMap) {
         LinkedList<Node<Integer>> nodes = new LinkedList<>();
         for (Map.Entry<String, Integer> wordOccurrence : wordsMap.entrySet()) {
             nodes.add(new NamedLeaf<>(wordOccurrence.getKey(), wordOccurrence.getValue()));
         }
+        return nodes;
+    }
 
-        Collections.sort(nodes, (node1, node2) -> node1.getValue().compareTo(node2.getValue()));
-
+    private static void convertNodeListToTree(LinkedList<Node<Integer>> nodes) {
         while (nodes.size() > 1) {
             Node<Integer> firstChild = nodes.removeFirst();
             Node<Integer> secondChild = nodes.removeFirst();
@@ -49,18 +64,10 @@ public class Counter {
             newParentNode.addChild(firstChild);
             newParentNode.addChild(secondChild);
             int newIndex = 0;
-            while (!nodes.isEmpty() && nodes.get(newIndex).getValue() < newParentNode.getValue() && newIndex < nodes.size() - 1) { newIndex++; }
+            while (!nodes.isEmpty() && newIndex < nodes.size() && nodes.get(newIndex).getValue() < newParentNode.getValue()) {
+                newIndex++; }
             nodes.add(newIndex, newParentNode);
         }
-
-        Node<Integer> root = nodes.get(0);
-
-        PrintStream stdout = new PrintStream(System.out, true, "UTF-8");
-
-        root.print(stdout);
-
-
-        Thread.currentThread().sleep(1000);
     }
 
     private static String getUsageDescription() {
